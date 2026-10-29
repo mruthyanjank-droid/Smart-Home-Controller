@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMART HOME // CYBER COMMAND & CONTROL (C2)</title>
+    <link rel="stylesheet" href="/css/cyber-c2.css">
+</head>
+<body>
+    <div class="scanlines"></div>
+
+    <!-- C2 Master Navigation Header -->
+    <header class="c2-header">
+        <div class="c2-brand">
+            <span class="brand-icon"></span>
+            <a href="#dashboard" class="brand-glitch" onclick="navigateTo('dashboard')">
+                SMART HOME // C2
+            </a>
+        </div>
+
+        <ul class="nav-links">
+            <li class="nav-item active" id="nav-dashboard"><a onclick="navigateTo('dashboard')"><span>◈</span> DASHBOARD</a></li>
+            <li class="nav-item" id="nav-device-light"><a onclick="navigateTo('device-light')"><span>💡</span> LIGHT-01</a></li>
+            <li class="nav-item" id="nav-device-fan"><a onclick="navigateTo('device-fan')"><span>🌀</span> FAN-01</a></li>
+            <li class="nav-item" id="nav-device-ac"><a onclick="navigateTo('device-ac')"><span>❄️</span> AC-01</a></li>
+            <li class="nav-item" id="nav-device-lock"><a onclick="navigateTo('device-lock')"><span>🔒</span> LOCK-01</a></li>
+            <li class="nav-item" id="nav-architecture"><a onclick="navigateTo('architecture')"><span>⚡</span> ARCHITECTURE</a></li>
+        </ul>
+
+        <div class="header-status">
+            <div class="operator-badge">OPERATOR: ROOT // LVL-5</div>
+            <div class="status-pill">
+                <span class="pulse-dot" id="header-pulse-dot"></span>
+                <span id="header-server-status">CONTROLLER: 5000 [ACTIVE]</span>
+            </div>
+            <button class="tool-btn" id="btn-toggle-audio" title="Toggle Synthesized Audio SFX">🔊 AUDIO ON</button>
+            <button class="tool-btn" id="btn-toggle-crt" title="Toggle Scanline Filter">CRT</button>
+        </div>
+    </header>
+
+    <div class="app-container">
+
+        <!-- ================================================================
+             VIEW 1: MAIN COMMAND CENTER DASHBOARD
+             ================================================================ -->
+        <main id="view-dashboard" class="view-pane active">
+
+            <!-- System Telemetry Bar -->
+            <div class="telemetry-grid">
+                <div class="telemetry-card">
+                    <div class="telemetry-label"><span>CONNECTED DEVICES</span> <span>NODES</span></div>
+                    <div class="telemetry-value" id="metric-online-devices">4 / 4</div>
+                    <div class="telemetry-sub">TCP Real Socket Clients</div>
+                </div>
+                <div class="telemetry-card green">
+                    <div class="telemetry-label"><span>TOTAL COMMANDS</span> <span>TX/RX</span></div>
+                    <div class="telemetry-value" id="metric-cmds">0</div>
+                    <div class="telemetry-sub">Line-Based TCP Packets</div>
+                </div>
+                <div class="telemetry-card amber">
+                    <div class="telemetry-label"><span>ACKNOWLEDGED</span> <span>CONFIRMED</span></div>
+                    <div class="telemetry-value" id="metric-acks">0</div>
+                    <div class="telemetry-sub">Genuine Device Acknowledgements</div>
+                </div>
+                <div class="telemetry-card blue">
+                    <div class="telemetry-label"><span>SYSTEM UPTIME</span> <span>SESSION</span></div>
+                    <div class="telemetry-value" id="metric-uptime">00:00:00</div>
+                    <div class="telemetry-sub">Port 5000 Active Listener</div>
+                </div>
+            </div>
+
+            <!-- 4 Interactive Device Status Cards -->
+            <div class="section-title">PERIPHERAL DEVICE MATRIX // LIVE TELEMETRY</div>
+            <div class="devices-grid">
+
+                <!-- 1. LIGHT-01 -->
+                <div class="device-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h3>LIGHT-01</h3>
+                            <div class="device-id">NODE_ADDR: TCP://LIGHT-CLIENT</div>
+                        </div>
+                        <span class="device-badge online" id="card-light-badge">ONLINE</span>
+                    </div>
+                    <div class="device-visual-zone">
+                        <div class="visual-graphic">
+                            <span class="bulb-icon" id="graphic-bulb">💡</span>
+                        </div>
+                        <div class="visual-state-readout">
+                            <div class="state-headline" id="card-light-state">DORMANT</div>
+                            <div class="state-sub">Primary Luminescence</div>
+                        </div>
+                    </div>
+                    <div class="card-meta">
+                        <div class="meta-row"><span class="meta-label">LAST_CMD:</span> <span class="meta-value" id="card-light-lastcmd">NONE</span></div>
+                        <div class="meta-row"><span class="meta-label">RESPONSE:</span> <span class="meta-value" id="card-light-lastresp">NONE</span></div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-quick" onclick="submitCommand('LIGHT ON')">ON</button>
+                        <button class="btn-quick" onclick="submitCommand('LIGHT OFF')">OFF</button>
+                        <a class="btn-open-panel" onclick="navigateTo('device-light')">OPEN CONTROL PANEL &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- 2. FAN-01 -->
+                <div class="device-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h3>FAN-01</h3>
+                            <div class="device-id">NODE_ADDR: TCP://FAN-CLIENT</div>
+                        </div>
+                        <span class="device-badge online" id="card-fan-badge">ONLINE</span>
+                    </div>
+                    <div class="device-visual-zone">
+                        <div class="visual-graphic">
+                            <div class="fan-turbine" id="graphic-fan">
+                                <span class="fan-blades">🌀</span>
+                            </div>
+                        </div>
+                        <div class="visual-state-readout">
+                            <div class="state-headline" id="card-fan-state">HALTED</div>
+                            <div class="state-sub">Ceiling Turbine [1-5 SPD]</div>
+                        </div>
+                    </div>
+                    <div class="card-meta">
+                        <div class="meta-row"><span class="meta-label">LAST_CMD:</span> <span class="meta-value" id="card-fan-lastcmd">NONE</span></div>
+                        <div class="meta-row"><span class="meta-label">RESPONSE:</span> <span class="meta-value" id="card-fan-lastresp">NONE</span></div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-quick" onclick="submitCommand('FAN ON')">ON</button>
+                        <button class="btn-quick" onclick="submitCommand('FAN OFF')">OFF</button>
+                        <a class="btn-open-panel" onclick="navigateTo('device-fan')">OPEN CONTROL PANEL &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- 3. AC-01 -->
+                <div class="device-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h3>AC-01</h3>
+                            <div class="device-id">NODE_ADDR: TCP://AC-CLIENT</div>
+                        </div>
+                        <span class="device-badge online" id="card-ac-badge">ONLINE</span>
+                    </div>
+                    <div class="device-visual-zone">
+                        <div class="visual-graphic">
+                            <span class="ac-gauge" id="graphic-ac">❄️</span>
+                        </div>
+                        <div class="visual-state-readout">
+                            <div class="state-headline" id="card-ac-state">OFF (24°C)</div>
+                            <div class="state-sub">Climate Matrix [16-30°C]</div>
+                        </div>
+                    </div>
+                    <div class="card-meta">
+                        <div class="meta-row"><span class="meta-label">LAST_CMD:</span> <span class="meta-value" id="card-ac-lastcmd">NONE</span></div>
+                        <div class="meta-row"><span class="meta-label">RESPONSE:</span> <span class="meta-value" id="card-ac-lastresp">NONE</span></div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-quick" onclick="submitCommand('AC ON')">ON</button>
+                        <button class="btn-quick" onclick="submitCommand('AC OFF')">OFF</button>
+                        <a class="btn-open-panel" onclick="navigateTo('device-ac')">OPEN CONTROL PANEL &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- 4. LOCK-01 -->
+                <div class="device-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h3>LOCK-01</h3>
+                            <div class="device-id">NODE_ADDR: TCP://LOCK-CLIENT</div>
+                        </div>
+                        <span class="device-badge online" id="card-lock-badge">ONLINE</span>
+                    </div>
+                    <div class="device-visual-zone">
+                        <div class="visual-graphic">
+                            <span class="lock-shield locked" id="graphic-lock">🔒</span>
+                        </div>
+                        <div class="visual-state-readout">
+                            <div class="state-headline" id="card-lock-state">SECURE [LOCKED]</div>
+                            <div class="state-sub">Perimeter Biometric Bolt</div>
+                        </div>
+                    </div>
+                    <div class="card-meta">
+                        <div class="meta-row"><span class="meta-label">LAST_CMD:</span> <span class="meta-value" id="card-lock-lastcmd">NONE</span></div>
+                        <div class="meta-row"><span class="meta-label">RESPONSE:</span> <span class="meta-value" id="card-lock-lastresp">NONE</span></div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-quick" onclick="submitCommand('SMARTLOCK LOCK')">LOCK</button>
+                        <button class="btn-quick" onclick="submitCommand('SMARTLOCK UNLOCK')">UNLOCK</button>
+                        <a class="btn-open-panel" onclick="navigateTo('device-lock')">OPEN CONTROL PANEL &rarr;</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Lower Split Deck: Interactive Terminal + Live Event Stream -->
+            <div class="split-deck">
+
+                <!-- Central Interactive Command Terminal -->
+                <div class="terminal-panel">
+                    <div class="terminal-header">
+                        <div class="term-dots">
+                            <span class="term-dot r"></span>
+                            <span class="term-dot y"></span>
+                            <span class="term-dot g"></span>
+                        </div>
+                        <div class="term-title">OPERATOR // SECURE TCP COMMAND TERMINAL (UTF-8 PROTOCOL)</div>
+                        <button class="tool-btn" id="btn-clear-term">CLEAR</button>
+                    </div>
+                    <div class="terminal-body" id="terminal-logs">
+                        <div class="terminal-line term-sys">
+                            <span class="term-time">[00:00:01]</span> <span class="term-prefix">C2-UPLINK</span> > <span>AUTHENTICATED AS ROOT // PROTOCOL: TCP LINE-DELIMITED</span>
+                        </div>
+                        <div class="terminal-line term-sys">
+                            <span class="term-time">[00:00:01]</span> <span class="term-prefix">SYSTEM</span> > <span>TYPE 'HELP' OR 'STATUS ALL' OR CLICK CHIPS BELOW</span>
+                        </div>
+                    </div>
+                    <div class="quick-chips">
+                        <span class="quick-chip" onclick="submitCommand('STATUS ALL')">STATUS ALL</span>
+                        <span class="quick-chip" onclick="submitCommand('LIST')">LIST</span>
+                        <span class="quick-chip" onclick="submitCommand('LIGHT ON')">LIGHT ON</span>
+                        <span class="quick-chip" onclick="submitCommand('LIGHT OFF')">LIGHT OFF</span>
+                        <span class="quick-chip" onclick="submitCommand('FAN SPEED 3')">FAN SPEED 3</span>
+                        <span class="quick-chip" onclick="submitCommand('AC SET 21')">AC SET 21</span>
+                        <span class="quick-chip" onclick="submitCommand('SMARTLOCK UNLOCK')">SMARTLOCK UNLOCK</span>
+                        <span class="quick-chip" onclick="submitCommand('SMARTLOCK LOCK')">SMARTLOCK LOCK</span>
+                        <span class="quick-chip" onclick="submitCommand('SCHEDULE LIGHT OFF 10')">SCHEDULE (10s)</span>
+                    </div>
+                    <div class="terminal-input-bar">
+                        <span class="term-prompt">OPERATOR@C2-HQ:~$</span>
+                        <input type="text" class="term-input" id="terminal-input" placeholder="Type command (e.g. LIGHT ON, AC SET 22) and hit Enter..." autocomplete="off" spellcheck="false">
+                        <button class="btn-send-cmd" id="btn-terminal-send">TRANSMIT</button>
+                    </div>
+                </div>
+
+                <!-- Live Event Monitor Feed -->
+                <div class="events-panel">
+                    <div class="events-header">
+                        <span class="section-title" style="margin-bottom:0">LIVE EVENT FEED // TCP LOGS</span>
+                        <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim)">REAL-TIME</span>
+                    </div>
+                    <div class="events-list" id="events-stream">
+                        <!-- Populated dynamically via fetchTelemetry() -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CTF Mission Objectives Panel -->
+            <div class="mission-card">
+                <div class="section-title" style="margin-bottom:0">CTF MISSION OBJECTIVES // SYSTEM VALIDATION</div>
+                <div class="mission-grid">
+                    <div class="mission-item" id="obj-uplink">
+                        <div class="mission-check">&#10003;</div>
+                        <div class="mission-text">
+                            <h5>OBJECTIVE 01: C2 UPLINK</h5>
+                            <p>Verify TCP Socket Server active on Port 5000</p>
+                        </div>
+                    </div>
+                    <div class="mission-item" id="obj-light">
+                        <div class="mission-check">&times;</div>
+                        <div class="mission-text">
+                            <h5>OBJECTIVE 02: ENERGIZE LIGHT MATRIX</h5>
+                            <p>Send 'LIGHT ON' and receive genuine device ACK</p>
+                        </div>
+                    </div>
+                    <div class="mission-item" id="obj-fan">
+                        <div class="mission-check">&times;</div>
+                        <div class="mission-text">
+                            <h5>OBJECTIVE 03: TURBINE OVERDRIVE</h5>
+                            <p>Set Fan to Speed 4 or higher via 'FAN SPEED'</p>
+                        </div>
+                    </div>
+                    <div class="mission-item" id="obj-ac">
+                        <div class="mission-check">&times;</div>
+                        <div class="mission-text">
+                            <h5>OBJECTIVE 04: THERMAL COOLING OVERRIDE</h5>
+                            <p>Cool mainframe to 21°C or below via 'AC SET'</p>
+                        </div>
+                    </div>
+                    <div class="mission-item" id="obj-lock">
+                        <div class="mission-check">&times;</div>
+                        <div class="mission-text">
+                            <h5>OBJECTIVE 05: PERIMETER LOCKDOWN</h5>
+                            <p>Engage SmartLock to verify security bolt status</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+
+        <!-- ================================================================
+             VIEW 2: DEDICATED SMART LIGHT CONTROL
+             ================================================================ -->
+        <section id="view-device-light" class="view-pane detail-view">
+            <a class="detail-nav-back" onclick="navigateTo('dashboard')">&larr; BACK TO COMMAND CENTER</a>
+            <div class="section-title">DEVICE CONTROL PANEL // LIGHT-01</div>
+            
+            <div class="detail-layout">
+                <div class="detail-control-box">
+                    <h3>LIGHT-01 // PRIMARY LUMINESCENCE</h3>
+                    <p style="color:var(--text-muted);font-size:0.85rem;margin-top:4px">
+                        Simulated Smart Bulb communicating over Java Socket endpoint.
+                    </p>
+                    <div style="margin:20px 0;font-family:var(--font-mono)">
+                        <div>CONNECTION STATUS: <span class="badge" style="background:#d1e7dd;color:#0f5132">CONNECTED</span></div>
+                        <div style="margin-top:8px">CURRENT STATE: <strong id="detail-light-status" style="color:var(--neon-cyan)">UNKNOWN</strong></div>
+                        <div style="margin-top:8px">LAST RESPONSE: <code id="detail-light-resp">NONE</code></div>
+                    </div>
+                    <div class="btn-group-c2">
+                        <button class="btn-c2-action btn-power-on" onclick="submitCommand('LIGHT ON')">TURN POWER ON</button>
+                        <button class="btn-c2-action btn-power-off" onclick="submitCommand('LIGHT OFF')">TURN POWER OFF</button>
+                    </div>
+                    <button class="btn-quick" style="width:100%" onclick="submitCommand('LIGHT STATUS')">QUERY LIVE DEVICE STATUS</button>
+                </div>
+                <div class="detail-control-box">
+                    <h4>PROTOCOL SPECIFICATION</h4>
+                    <p style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);margin-top:10px">
+                        Command: <code>LIGHT ON</code> &rarr; Response: <code>OK LIGHT IS ON</code><br>
+                        Command: <code>LIGHT OFF</code> &rarr; Response: <code>OK LIGHT IS OFF</code><br>
+                        Command: <code>LIGHT STATUS</code> &rarr; Response: <code>OK LIGHT STATUS: ON|OFF</code>
+                    </p>
+                    <h4 style="margin-top:20px">OBJECT-ORIENTED CLASS HIERARCHY</h4>
+                    <p style="font-size:0.8rem;color:var(--text-muted);margin-top:6px">
+                        Extends <code>smarthome.device.Device</code>. Overrides <code>processCommand(String cmd)</code> and encapsulates boolean <code>isOn</code> behind thread-safe synchronizations.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================================================================
+             VIEW 3: DEDICATED SMART FAN CONTROL
+             ================================================================ -->
+        <section id="view-device-fan" class="view-pane detail-view">
+            <a class="detail-nav-back" onclick="navigateTo('dashboard')">&larr; BACK TO COMMAND CENTER</a>
+            <div class="section-title">DEVICE CONTROL PANEL // FAN-01</div>
+
+            <div class="detail-layout">
+                <div class="detail-control-box">
+                    <h3>FAN-01 // CEILING TURBINE CONTROLLER</h3>
+                    <p style="color:var(--text-muted);font-size:0.85rem;margin-top:4px">
+                        5-Speed Smart Ceiling Fan with asynchronous socket feedback.
+                    </p>
+                    <div style="margin:20px 0;font-family:var(--font-mono)">
+                        <div>CURRENT STATE: <strong id="detail-fan-status" style="color:var(--neon-cyan)">UNKNOWN</strong></div>
+                        <div style="margin-top:8px">LAST RESPONSE: <code id="detail-fan-resp">NONE</code></div>
+                    </div>
+                    <div class="btn-group-c2">
+                        <button class="btn-c2-action btn-power-on" onclick="submitCommand('FAN ON')">TURN POWER ON</button>
+                        <button class="btn-c2-action btn-power-off" onclick="submitCommand('FAN OFF')">TURN POWER OFF</button>
+                    </div>
+
+                    <div style="margin-top:18px">
+                        <label style="font-family:var(--font-mono);font-size:0.85rem">SELECT TURBINE SPEED (1 - 5):</label>
+                        <div class="speed-buttons">
+                            <button class="speed-btn" data-speed="1" onclick="submitCommand('FAN SPEED 1')">1</button>
+                            <button class="speed-btn" data-speed="2" onclick="submitCommand('FAN SPEED 2')">2</button>
+                            <button class="speed-btn" data-speed="3" onclick="submitCommand('FAN SPEED 3')">3</button>
+                            <button class="speed-btn" data-speed="4" onclick="submitCommand('FAN SPEED 4')">4</button>
+                            <button class="speed-btn" data-speed="5" onclick="submitCommand('FAN SPEED 5')">5</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-control-box">
+                    <h4>PROTOCOL SPECIFICATION</h4>
+                    <p style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);margin-top:10px">
+                        Command: <code>FAN ON</code> &rarr; Response: <code>OK FAN IS ON (SPEED 1)</code><br>
+                        Command: <code>FAN OFF</code> &rarr; Response: <code>OK FAN IS OFF</code><br>
+                        Command: <code>FAN SPEED &lt;1-5&gt;</code> &rarr; Response: <code>OK FAN SPEED SET TO &lt;N&gt;</code><br>
+                        Out of Range: <code>FAN SPEED 9</code> &rarr; <code>ERROR INVALID FAN SPEED: USE 1-5</code>
+                    </p>
+                    <h4 style="margin-top:20px">OBJECT-ORIENTED CLASS HIERARCHY</h4>
+                    <p style="font-size:0.8rem;color:var(--text-muted);margin-top:6px">
+                        Extends <code>smarthome.device.Device</code>. Encapsulates <code>int speed</code> (1-5) and <code>boolean isOn</code>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================================================================
+             VIEW 4: DEDICATED SMART AC CONTROL
+             ================================================================ -->
+        <section id="view-device-ac" class="view-pane detail-view">
+            <a class="detail-nav-back" onclick="navigateTo('dashboard')">&larr; BACK TO COMMAND CENTER</a>
+            <div class="section-title">DEVICE CONTROL PANEL // AC-01</div>
+
+            <div class="detail-layout">
+                <div class="detail-control-box">
+                    <h3>AC-01 // AIR CONDITIONER & CLIMATE MATRIX</h3>
+                    <p style="color:var(--text-muted);font-size:0.85rem;margin-top:4px">
+                        Climate Control unit with bounded temperature validation (16°C - 30°C).
+                    </p>
+                    <div style="margin:20px 0;font-family:var(--font-mono)">
+                        <div>CURRENT STATE: <strong id="detail-ac-status" style="color:var(--neon-cyan)">UNKNOWN</strong></div>
+                        <div style="margin-top:8px">CURRENT TEMPERATURE: <strong id="detail-ac-temp-val" style="color:var(--neon-cyan)">24°C</strong></div>
+                        <div style="margin-top:8px">LAST RESPONSE: <code id="detail-ac-resp">NONE</code></div>
+                    </div>
+                    <div class="btn-group-c2">
+                        <button class="btn-c2-action btn-power-on" onclick="submitCommand('AC ON')">TURN POWER ON</button>
+                        <button class="btn-c2-action btn-power-off" onclick="submitCommand('AC OFF')">TURN POWER OFF</button>
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label-row">
+                            <span>ADJUST TEMPERATURE (16°C - 30°C):</span>
+                            <span id="detail-ac-slider-val" style="color:var(--neon-cyan);font-weight:700">24°C</span>
+                        </div>
+                        <input type="range" class="c2-slider" id="detail-ac-slider" min="16" max="30" value="24" step="1">
+                        <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim)">
+                            <span>16°C (MIN)</span>
+                            <span>24°C (DEFAULT)</span>
+                            <span>30°C (MAX)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-control-box">
+                    <h4>PROTOCOL SPECIFICATION</h4>
+                    <p style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);margin-top:10px">
+                        Command: <code>AC ON</code> &rarr; Response: <code>OK AC IS ON (24°C)</code><br>
+                        Command: <code>AC SET 22</code> &rarr; Response: <code>OK AC TEMPERATURE SET TO 22°C</code><br>
+                        Boundary Violation: <code>AC SET 10</code> &rarr; <code>ERROR INVALID TEMPERATURE: USE 16-30</code>
+                    </p>
+                    <h4 style="margin-top:20px">OBJECT-ORIENTED CLASS HIERARCHY</h4>
+                    <p style="font-size:0.8rem;color:var(--text-muted);margin-top:6px">
+                        Extends <code>Device</code>. Strictly encapsulates integer <code>temperature</code> and guarantees hardware safety boundaries.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================================================================
+             VIEW 5: DEDICATED SMART LOCK CONTROL
+             ================================================================ -->
+        <section id="view-device-lock" class="view-pane detail-view">
+            <a class="detail-nav-back" onclick="navigateTo('dashboard')">&larr; BACK TO COMMAND CENTER</a>
+            <div class="section-title">DEVICE CONTROL PANEL // LOCK-01</div>
+
+            <div class="detail-layout">
+                <div class="detail-control-box">
+                    <h3>LOCK-01 // BIOMETRIC PERIMETER DEADBOLT</h3>
+                    <p style="color:var(--text-muted);font-size:0.85rem;margin-top:4px">
+                        Autonomous access control latch with tamper-resistant states.
+                    </p>
+                    <div style="margin:20px 0;font-family:var(--font-mono)">
+                        <div>LOCK STATUS: <strong id="detail-lock-status" style="color:var(--neon-red)">UNKNOWN</strong></div>
+                        <div style="margin-top:8px">LAST RESPONSE: <code id="detail-lock-resp">NONE</code></div>
+                    </div>
+                    <div class="btn-group-c2">
+                        <button class="btn-c2-action" style="background:rgba(255,51,102,0.15);border-color:var(--neon-red);color:var(--neon-red)" onclick="submitCommand('SMARTLOCK LOCK')">ENGAGE LOCK</button>
+                        <button class="btn-c2-action" style="background:rgba(0,255,102,0.15);border-color:var(--neon-green);color:var(--neon-green)" onclick="submitCommand('SMARTLOCK UNLOCK')">DISENGAGE (UNLOCK)</button>
+                    </div>
+                    <button class="btn-quick" style="width:100%" onclick="submitCommand('SMARTLOCK STATUS')">QUERY DEADBOLT SENSOR</button>
+                </div>
+
+                <div class="detail-control-box">
+                    <h4>PROTOCOL SPECIFICATION</h4>
+                    <p style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);margin-top:10px">
+                        Command: <code>SMARTLOCK LOCK</code> &rarr; Response: <code>OK SMARTLOCK IS LOCKED</code><br>
+                        Command: <code>SMARTLOCK UNLOCK</code> &rarr; Response: <code>OK SMARTLOCK IS UNLOCKED</code><br>
+                        Command: <code>SMARTLOCK STATUS</code> &rarr; Response: <code>OK SMARTLOCK STATUS: LOCKED|UNLOCKED</code>
+                    </p>
+                    <h4 style="margin-top:20px">OBJECT-ORIENTED CLASS HIERARCHY</h4>
+                    <p style="font-size:0.8rem;color:var(--text-muted);margin-top:6px">
+                        Extends <code>Device</code>. Default failsafe posture is <code>isLocked = true</code>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================================================================
+             VIEW 6: INTERACTIVE SYSTEM ARCHITECTURE & PACKET TRACER
+             ================================================================ -->
+        <section id="view-architecture" class="view-pane detail-view">
+            <a class="detail-nav-back" onclick="navigateTo('dashboard')">&larr; BACK TO COMMAND CENTER</a>
+            <div class="section-title">SYSTEM ARCHITECTURE // DISTRIBUTED SOCKET PIPELINE</div>
+
+            <div class="detail-control-box" style="margin-bottom:24px">
+                <h3>INTERACTIVE END-TO-END PACKET ROUTING</h3>
+                <p style="color:var(--text-muted);font-size:0.85rem;margin-top:4px">
+                    Watch the live packet route from Operator Browser through the Java Controller to simulated device TCP sockets and back.
+                </p>
+
+                <!-- Visual Packet Animation Track -->
+                <div class="arch-stage-container">
+                    <div class="arch-node" id="arch-node-dashboard">
+                        <h4>1. OPERATOR C2</h4>
+                        <p>Browser Client (HTTP/REST)</p>
+                    </div>
+                    <div class="arch-connector">
+                        <div class="arch-packet" id="arch-anim-packet"></div>
+                    </div>
+                    <div class="arch-node" id="arch-node-gateway">
+                        <h4>2. INTEGRATION GATEWAY</h4>
+                        <p>ClientHandler (JSON/HTTP)</p>
+                    </div>
+                    <div class="arch-connector"></div>
+                    <div class="arch-node" id="arch-node-server">
+                        <h4>3. CONTROLLER SERVER</h4>
+                        <p>DeviceRegistry & Router (Port 5000)</p>
+                    </div>
+                    <div class="arch-connector"></div>
+                    <div class="arch-node" id="arch-node-device">
+                        <h4>4. SMART DEVICES</h4>
+                        <p>Real TCP Sockets (REQ-ID/RES-ID)</p>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:10px;justify-content:center">
+                    <button class="btn-quick" onclick="submitCommand('LIGHT ON')">Simulate 'LIGHT ON' Packet</button>
+                    <button class="btn-quick" onclick="submitCommand('AC SET 21')">Simulate 'AC SET 21' Packet</button>
+                    <button class="btn-quick" onclick="submitCommand('SMARTLOCK LOCK')">Simulate 'LOCK' Packet</button>
+                </div>
+            </div>
+
+            <!-- Academic Concepts Breakdown for Viva -->
+            <div class="detail-layout">
+                <div class="detail-control-box">
+                    <h4>NETWORKING CORE CONCEPTS</h4>
+                    <div style="margin-top:14px;font-size:0.82rem;color:var(--text-muted);line-height:1.7">
+                        <p><strong style="color:var(--neon-cyan)">ServerSocket vs Socket:</strong> ServerSocket listens on port 5000 via <code>accept()</code>. When a device connects, it returns a <code>Socket</code> dedicated to that client's stream.</p>
+                        <p style="margin-top:10px"><strong style="color:var(--neon-cyan)">Multithreading:</strong> Every connection is handled on a dedicated thread (<code>ClientHandler</code> / <code>DeviceSession</code>), preventing blocking socket I/O.</p>
+                        <p style="margin-top:10px"><strong style="color:var(--neon-cyan)">Asynchronous Correlation:</strong> Commands carry unique IDs (<code>REQ-101</code> &rarr; <code>RES-101</code>) and are resolved via <code>CompletableFuture</code>, eliminating race conditions across threads.</p>
+                    </div>
+                </div>
+
+                <div class="detail-control-box">
+                    <h4>OBJECT-ORIENTED ARCHITECTURE</h4>
+                    <div style="margin-top:14px;font-size:0.82rem;color:var(--text-muted);line-height:1.7">
+                        <p><strong style="color:var(--neon-green)">Abstraction:</strong> Abstract class <code>Device</code> defines template connection methods and lifecycle loops.</p>
+                        <p style="margin-top:10px"><strong style="color:var(--neon-green)">Inheritance:</strong> <code>Light</code>, <code>Fan</code>, <code>AC</code>, and <code>SmartLock</code> extend <code>Device</code>.</p>
+                        <p style="margin-top:10px"><strong style="color:var(--neon-green)">Polymorphism:</strong> Overridden <code>processCommand()</code> executes device-specific logic dynamically at runtime.</p>
+                        <p style="margin-top:10px"><strong style="color:var(--neon-green)">Encapsulation:</strong> Hardware variables (temperature, speed, power) are private and thread-safe.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/cyber-c2.js"></script>
+</body>
+</html>
